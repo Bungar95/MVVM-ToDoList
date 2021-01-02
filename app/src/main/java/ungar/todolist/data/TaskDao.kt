@@ -2,7 +2,6 @@ package ungar.todolist.data
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
-import ungar.todolist.ui.tasks.SortOrder
 
 //Data Access Object
 //Interface for various database method that we'll use
