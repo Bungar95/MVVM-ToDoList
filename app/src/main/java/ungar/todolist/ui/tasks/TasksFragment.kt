@@ -31,6 +31,8 @@ class TasksFragment: Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemClick
 
     private val viewModel: TasksViewModel by viewModels()
 
+    private lateinit var searchView: SearchView
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -118,7 +120,13 @@ class TasksFragment: Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemClick
         inflater.inflate(R.menu.menu_fragment_tasks, menu)
 
         val searchItem = menu.findItem(R.id.action_search)
-        val searchView = searchItem.actionView as SearchView
+        searchView = searchItem.actionView as SearchView
+
+        val pendingQuery = viewModel.searchQuery.value
+        if(pendingQuery != null && pendingQuery.isNotEmpty()){
+            searchItem.expandActionView()
+            searchView.setQuery(pendingQuery, false)
+        }
 
         //from viewext.kt, not the default onquerytextlistener
         searchView.onQueryTextChanged {
@@ -129,7 +137,6 @@ class TasksFragment: Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemClick
             menu.findItem(R.id.action_hide_completed_tasks).isChecked =
                 viewModel.preferencesFlow.first().hideCompleted
         }
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -154,4 +161,11 @@ class TasksFragment: Fragment(R.layout.fragment_tasks), TasksAdapter.OnItemClick
             else -> super.onOptionsItemSelected(item)
         }
     }
+
+    //https://youtu.be/z3q943EPP5s?t=161
+    override fun onDestroyView() {
+        super.onDestroyView()
+        searchView.setOnQueryTextListener(null)
+    }
+
 }
