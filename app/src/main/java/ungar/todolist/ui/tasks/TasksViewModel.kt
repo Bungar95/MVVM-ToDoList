@@ -13,6 +13,8 @@ import ungar.todolist.data.PreferencesManager
 import ungar.todolist.data.SortOrder
 import ungar.todolist.data.Task
 import ungar.todolist.data.TaskDao
+import ungar.todolist.ui.ADD_TASK_RESULT_OK
+import ungar.todolist.ui.EDIT_TASK_RESULT_OK
 
 class TasksViewModel @ViewModelInject constructor(
     private val taskDao: TaskDao,
@@ -71,11 +73,23 @@ class TasksViewModel @ViewModelInject constructor(
         tasksEventChannel.send(TasksEvent.NavigateToAddTaskScreen)
     }
 
+    fun onAddEditResult(result: Int){
+        when(result){
+            ADD_TASK_RESULT_OK -> showTaskSaveConfirmationMessage("Task added")
+            EDIT_TASK_RESULT_OK -> showTaskSaveConfirmationMessage("Task updated")
+        }
+    }
+
+    private fun showTaskSaveConfirmationMessage(text: String) = viewModelScope.launch {
+        tasksEventChannel.send(TasksEvent.ShowTaskSavedConfirmationMessage(text))
+    }
+
     // https://youtu.be/1C1Hw8s2IEM?t=262
     sealed class TasksEvent {
         object NavigateToAddTaskScreen: TasksEvent()
         data class NavigateToEditTaskScreen(val task: Task): TasksEvent()
         data class ShowUndoDeleteTaskMessage(val task: Task) : TasksEvent()
+        data class ShowTaskSavedConfirmationMessage(val msg: String) : TasksEvent()
     }
 
 }
